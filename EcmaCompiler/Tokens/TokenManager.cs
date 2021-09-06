@@ -59,21 +59,29 @@ namespace EcmaCompiler.Tokens {
         private Dictionary<string, int> _secondaryTokensByName = new Dictionary<string, int>();
 
         public Token SearchKeyword(string name) {
-            if (_tokensByName.TryGetValue(name, out var token)) return token;
+            if (_tokensByName.TryGetValue(name, out var token))
+                return token;
 
             if (Regex.IsMatch(name, _charPattern)) return CHARACTER;
             if (Regex.IsMatch(name, _stringPattern)) return STRINGVAL;
             if (Regex.IsMatch(name, _numeralPattern)) return NUMERAL;
-            if (Regex.IsMatch(name, _idPattern)) {
-                _secondaryTokensByName.TryAdd(name, _tokensByName.Count + 1);
-                return ID;
-            }
+            if (Regex.IsMatch(name, _idPattern)) return ID;
 
             return UNKNOWN;
         }
 
         public int SearchName(string name) {
+            if (_secondaryTokensByName.TryGetValue(name, out var token))
+                return token;
 
+            return SaveIdentifier(name);
+        }
+
+        private int SaveIdentifier(string name) {
+            var tokensCount = _secondaryTokensByName.Count + 1;
+            _secondaryTokensByName.Add(name, tokensCount);
+
+            return tokensCount;
         }
     }
 }
