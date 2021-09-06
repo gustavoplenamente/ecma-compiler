@@ -58,6 +58,10 @@ namespace EcmaCompiler.Tokens {
         };
         private Dictionary<string, int> _secondaryTokensByName = new Dictionary<string, int>();
 
+        private Pool<char> _characters = new Pool<char>();
+        private Pool<int> _integers = new Pool<int>();
+        private Pool<string> _strings = new Pool<string>();
+
         public Token SearchKeyword(string name) {
             if (_tokensByName.TryGetValue(name, out var token))
                 return token;
@@ -76,6 +80,10 @@ namespace EcmaCompiler.Tokens {
 
             return SaveIdentifier(name);
         }
+
+        public int AddCharConst(char value) => _characters.Add(value);
+        public int AddIntConst(int value) => _integers.Add(value);
+        public int AddStringConst(string value) => _strings.Add(value);
 
         private int SaveIdentifier(string name) {
             var tokensCount = _secondaryTokensByName.Count + 1;
