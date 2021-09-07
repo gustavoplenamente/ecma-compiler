@@ -62,6 +62,8 @@ namespace EcmaCompiler.Tokens {
         private Pool<int> _integers = new Pool<int>();
         private Pool<string> _strings = new Pool<string>();
 
+        private List<(Token, int)> _tokens = new List<(Token, int)>();
+
         public Token SearchKeyword(string name) {
             if (_tokensByName.TryGetValue(name, out var token))
                 return token;
@@ -90,6 +92,15 @@ namespace EcmaCompiler.Tokens {
             _secondaryTokensByName.Add(name, tokensCount);
 
             return tokensCount;
+        }
+
+        public void SaveToken((Token, int) token) {
+            _tokens.Add(token);
+        }
+
+        public void CreateAndSaveSymbolToken(string symbol) {
+            Token token = _tokensByName[symbol];
+            SaveToken((token, 0));
         }
     }
 }
