@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static EcmaCompiler.Tokens.Token;
+using System;
 
 namespace EcmaCompiler.Tokens {
     public class TokenManager {
@@ -101,6 +102,19 @@ namespace EcmaCompiler.Tokens {
         public void CreateAndSaveSymbolToken(string symbol) {
             Token token = _tokensByName[symbol];
             SaveToken((token, 0));
+        }
+
+        public void PrintTokens() {
+            foreach ((Token, int) tokenPair in _tokens) {
+                Token token;
+                int secondaryToken;
+                (token, secondaryToken) = tokenPair;
+                Console.Write(token);
+                if (secondaryToken > 0) {
+                    Console.Write("\t{0}", secondaryToken);
+                }
+                Console.WriteLine("");
+            }
         }
     }
 }

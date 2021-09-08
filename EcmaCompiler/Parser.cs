@@ -17,6 +17,7 @@ namespace EcmaCompiler {
 
         public void Parse(string filename) {
             _reader = new StreamReader(filename);
+            _nextChar = ' ';
 
             while (!_isDone) {
                 ParseNextRule();
@@ -26,7 +27,7 @@ namespace EcmaCompiler {
         private void ParseNextRule() {
             if (_isDone) return;
 
-            while (_nextChar == ' ') {
+            while (Char.IsWhiteSpace(_nextChar)) {
                 if (ParseNextChar() == null) return;
             }
 
@@ -62,8 +63,8 @@ namespace EcmaCompiler {
         }
 
         private char? ParseNextChar() {
-            if (_reader.Peek() == 0) {
-                _isDone = false;
+            if (_reader.Peek() < 0) {
+                _isDone = true;
                 return null;
             }
             _nextChar = (char) _reader.Read();
