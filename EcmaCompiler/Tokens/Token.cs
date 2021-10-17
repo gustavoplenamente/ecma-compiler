@@ -13,6 +13,7 @@
         IF,
         INTEGER,
         OF,
+        RETURN,
         STRING,
         STRUCT,
         TRUE,

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static EcmaCompiler.Tokens.Token;
-using System;
 
 namespace EcmaCompiler.Tokens {
     public class TokenManager {
@@ -23,6 +23,7 @@ namespace EcmaCompiler.Tokens {
             ["if"] = IF,
             ["integer"] = INTEGER,
             ["of"] = OF,
+            ["return"] = RETURN,
             ["string"] = STRING,
             ["struct"] = STRUCT,
             ["true"] = TRUE,

@@ -1,6 +1,5 @@
 ﻿using EcmaCompiler.Tokens;
 using EcmaCompiler.Utils;
-using System;
 using System.IO;
 using System.Text;
 
@@ -9,7 +8,7 @@ namespace EcmaCompiler {
         private StreamReader _reader;
         private TokenManager _tokenManager;
         private char _nextChar;
-        private Boolean _isDone = false;
+        private bool _isDone = false;
 
         public Parser(TokenManager tokenManager) {
             _tokenManager = tokenManager;
@@ -27,7 +26,7 @@ namespace EcmaCompiler {
         private void ParseNextRule() {
             if (_isDone) return;
 
-            while (Char.IsWhiteSpace(_nextChar)) {
+            while (char.IsWhiteSpace(_nextChar)) {
                 if (ParseNextChar() == null) return;
             }
 
@@ -39,19 +38,19 @@ namespace EcmaCompiler {
                 _tokenManager.SaveToken(ParseId());
                 return;
             }
-            
+
             if (_nextChar.IsDigit()) {
                 _tokenManager.SaveToken(ParseNumeral());
                 return;
             }
-            
+
             if (_nextChar == '\"') {
                 _tokenManager.CreateAndSaveSymbolToken("\"");
                 _tokenManager.SaveToken(ParseString());
                 _tokenManager.CreateAndSaveSymbolToken("\"");
                 return;
             }
-            
+
             if (_nextChar == '\'') {
                 _tokenManager.CreateAndSaveSymbolToken("\'");
                 _tokenManager.SaveToken(ParseChar());
@@ -67,7 +66,7 @@ namespace EcmaCompiler {
                 _isDone = true;
                 return null;
             }
-            _nextChar = (char) _reader.Read();
+            _nextChar = (char)_reader.Read();
             return _nextChar;
         }
 
@@ -102,7 +101,7 @@ namespace EcmaCompiler {
 
             var name = builder.ToString();
             var token = Token.NUMERAL;
-            var secondaryToken = _tokenManager.AddIntConst(Int32.Parse(name));
+            var secondaryToken = _tokenManager.AddIntConst(int.Parse(name));
 
             return (token, secondaryToken);
         }
@@ -141,139 +140,139 @@ namespace EcmaCompiler {
         private (Token, int) ParseSymbol() {
             if (_nextChar == ':') {
                 ParseNextChar();
-                return(Token.COLON, 0);
+                return (Token.COLON, 0);
             }
 
             if (_nextChar == ':') {
                 ParseNextChar();
-                return(Token.COLON, 0);
+                return (Token.COLON, 0);
             }
 
             if (_nextChar == ';') {
                 ParseNextChar();
-                return(Token.SEMI_COLON, 0);
+                return (Token.SEMI_COLON, 0);
             }
 
             if (_nextChar == ',') {
                 ParseNextChar();
-                return(Token.COMMA, 0);
+                return (Token.COMMA, 0);
             }
 
             if (_nextChar == '=') {
                 ParseNextChar();
                 if (_nextChar == '=') {
                     ParseNextChar();
-                    return(Token.EQUAL_EQUAL, 0);
+                    return (Token.EQUAL_EQUAL, 0);
                 }
-                return(Token.EQUALS, 0);
+                return (Token.EQUALS, 0);
             }
 
             if (_nextChar == '[') {
                 ParseNextChar();
-                return(Token.LEFT_SQUARE, 0);
+                return (Token.LEFT_SQUARE, 0);
             }
 
             if (_nextChar == ']') {
                 ParseNextChar();
-                return(Token.RIGHT_SQUARE, 0);
+                return (Token.RIGHT_SQUARE, 0);
             }
 
             if (_nextChar == '{') {
                 ParseNextChar();
-                return(Token.LEFT_BRACES, 0);
+                return (Token.LEFT_BRACES, 0);
             }
 
             if (_nextChar == '}') {
                 ParseNextChar();
-                return(Token.RIGHT_BRACES, 0);
+                return (Token.RIGHT_BRACES, 0);
             }
 
             if (_nextChar == '(') {
                 ParseNextChar();
-                return(Token.LEFT_PARENTHESIS, 0);
+                return (Token.LEFT_PARENTHESIS, 0);
             }
 
             if (_nextChar == ')') {
                 ParseNextChar();
-                return(Token.RIGHT_PARENTHESIS, 0);
+                return (Token.RIGHT_PARENTHESIS, 0);
             }
 
             if (_nextChar == '&') {
                 ParseNextChar();
                 if (_nextChar == '&') {
                     ParseNextChar();
-                    return(Token.AND, 0);
+                    return (Token.AND, 0);
                 }
-                return(Token.UNKNOWN, 0);
+                return (Token.UNKNOWN, 0);
             }
 
             if (_nextChar == '|') {
                 ParseNextChar();
                 if (_nextChar == '|') {
                     ParseNextChar();
-                    return(Token.OR, 0);
+                    return (Token.OR, 0);
                 }
-                return(Token.UNKNOWN, 0);
+                return (Token.UNKNOWN, 0);
             }
 
             if (_nextChar == '<') {
                 ParseNextChar();
                 if (_nextChar == '=') {
                     ParseNextChar();
-                    return(Token.LESS_OR_EQUAL, 0);
+                    return (Token.LESS_OR_EQUAL, 0);
                 }
-                return(Token.LESS_THAN, 0);
+                return (Token.LESS_THAN, 0);
             }
 
             if (_nextChar == '>') {
                 ParseNextChar();
                 if (_nextChar == '=') {
                     ParseNextChar();
-                    return(Token.GREATER_OR_EQUAL, 0);
+                    return (Token.GREATER_OR_EQUAL, 0);
                 }
-                return(Token.GREATER_THAN, 0);
+                return (Token.GREATER_THAN, 0);
             }
 
             if (_nextChar == '!') {
                 ParseNextChar();
                 if (_nextChar == '=') {
                     ParseNextChar();
-                    return(Token.NOT_EQUAL, 0);
+                    return (Token.NOT_EQUAL, 0);
                 }
-                return(Token.NOT, 0);
+                return (Token.NOT, 0);
             }
 
             if (_nextChar == '+') {
                 ParseNextChar();
                 if (_nextChar == '+') {
                     ParseNextChar();
-                    return(Token.PLUS_PLUS, 0);
+                    return (Token.PLUS_PLUS, 0);
                 }
-                return(Token.PLUS, 0);
+                return (Token.PLUS, 0);
             }
 
             if (_nextChar == '-') {
                 ParseNextChar();
                 if (_nextChar == '-') {
                     ParseNextChar();
-                    return(Token.MINUS_MINUS, 0);
+                    return (Token.MINUS_MINUS, 0);
                 }
-                return(Token.MINUS, 0);
+                return (Token.MINUS, 0);
             }
 
             if (_nextChar == '*') {
                 ParseNextChar();
-                return(Token.TIMES, 0);
+                return (Token.TIMES, 0);
             }
 
             if (_nextChar == '/') {
                 ParseNextChar();
-                return(Token.DIVIDE, 0);
+                return (Token.DIVIDE, 0);
             }
 
             if (_nextChar == '.') {
                 ParseNextChar();
-                return(Token.DOT, 0);
+                return (Token.DOT, 0);
             }
 
             return (Token.UNKNOWN, 0);
