@@ -19,4 +19,8 @@ namespace EcmaCompiler {
         REDECLARATION_ERROR,
         NOT_DECLARED_ERROR
     }
+
+    public class TypeError : Exception {
+        public TypeError(string? message) : base(message) { }
+    }
 }

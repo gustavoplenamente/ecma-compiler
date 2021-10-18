@@ -89,6 +89,10 @@ namespace EcmaCompiler.Tokens {
         public int AddIntConst(int value) => _integers.Add(value);
         public int AddStringConst(string value) => _strings.Add(value);
 
+        public char GetCharConst(int pos) => _characters.Get(pos);
+        public int GetIntConst(int pos) => _integers.Get(pos);
+        public string GetStringConst(int pos) => _strings.Get(pos);
+
         private int SaveIdentifier(string name) {
             var tokensCount = _secondaryTokensByName.Count + 1;
             _secondaryTokensByName.Add(name, tokensCount);

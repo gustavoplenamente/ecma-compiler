@@ -1,5 +1,7 @@
 ﻿using EcmaCompiler.Parsers;
 using EcmaCompiler.Tokens;
+using EcmaCompiler.Utils;
+using System.Collections.Generic;
 using static EcmaCompiler.Tokens.Token;
 
 namespace EcmaCompiler {
@@ -35,31 +37,60 @@ namespace EcmaCompiler {
             _current = _tokenManager.GetToken(_currentIndex);
         }
 
-        private void NUM() {
+        private TypeAttribute NUM() {
+            var pos = _currentName;
             Expect(NUMERAL);
+
+            return new TypeAttribute {
+                Type = TypeManager.Integer,
+                Pos = pos,
+                Val = _tokenManager.GetIntConst(pos)
+            };
         }
 
-        private void STR() {
+        private TypeAttribute STR() {
+            var pos = _currentName;
             Expect(STRINGVAL);
+
+            return new TypeAttribute {
+                Type = TypeManager.String,
+                Pos = pos,
+                Val = _tokenManager.GetStringConst(pos)
+            };
         }
 
-        private void CHR() {
+        private TypeAttribute CHR() {
+            var pos = _currentName;
             Expect(CHARACTER);
+
+            return new TypeAttribute {
+                Type = TypeManager.Char,
+                Pos = pos,
+                Val = _tokenManager.GetCharConst(pos)
+            };
         }
 
-        private void FALSE_() {
+        private TypeAttribute FALSE_() {
             Expect(FALSE);
+            return new TypeAttribute {
+                Type = TypeManager.Bool,
+                Val = false
+            };
         }
 
-        private void TRUE_() {
+        private TypeAttribute TRUE_() {
             Expect(TRUE);
+            return new TypeAttribute {
+                Type = TypeManager.Bool,
+                Val = true
+            };
         }
 
         private void ID_() {
             Expect(ID);
         }
 
-        private void IDD() {
+        private Object IDD() {
             var name = _currentName;
             ID_();
 
@@ -68,7 +99,20 @@ namespace EcmaCompiler {
             if (obj != null)
                 ScopeManager.ScopeError(ScopeErrorType.REDECLARATION_ERROR, name);
 
-            _scopeManager.Define(name);
+            return _scopeManager.Define(name);
+        }
+
+        private Object IDU() {
+            var name = _currentName;
+            ID_();
+
+            var obj = _scopeManager.Find(name);
+            if (obj is null) {
+                ScopeManager.ScopeError(ScopeErrorType.NOT_DECLARED_ERROR, name);
+                _scopeManager.Define(name);
+            }
+
+            return obj;
         }
 
         private void NB() {
@@ -84,25 +128,21 @@ namespace EcmaCompiler {
             SyntaxError(END);
         }
 
-        private void IDU() {
-            var name = _currentName;
-            ID_();
-
-            var obj = _scopeManager.Find(name);
-            if (obj is null) {
-                ScopeManager.ScopeError(ScopeErrorType.NOT_DECLARED_ERROR, name);
-                _scopeManager.Define(name);
-            }
-        }
-
-        private void T() {
+        private TypeAttribute T() {
             switch (_currentToken) {
-                case INTEGER: Expect(INTEGER); break;
-                case CHAR: Expect(CHAR); break;
-                case BOOLEAN: Expect(BOOLEAN); break;
-                case STRING: Expect(STRING); break;
-                case ID: IDU(); break;
-                default: SyntaxError(); break;
+                case INTEGER: Expect(INTEGER); return new TypeAttribute() { Type = TypeManager.Integer };
+                case CHAR: Expect(CHAR); return new TypeAttribute() { Type = TypeManager.Char };
+                case BOOLEAN: Expect(BOOLEAN); return new TypeAttribute() { Type = TypeManager.Bool };
+                case STRING: Expect(STRING); return new TypeAttribute() { Type = TypeManager.String };
+                case ID:
+                    var obj = IDU();
+                    if (obj.Kind.IsType() || obj.Kind == Kind.UNIVERSAL_)
+                        return new TypeAttribute() { Type = obj };
+
+                    TypeManager.TypeError();
+                    return new TypeAttribute() { Type = TypeManager.Universal };
+
+                default: SyntaxError(); return new TypeAttribute() { Type = TypeManager.Universal };
             }
         }
 
@@ -232,20 +272,27 @@ namespace EcmaCompiler {
             }
         }
 
-        private void LI() {
-            IDD();
+        private IEnumerable<Object> LI() {
+            List<Object> list = new() { IDD() };
 
             while (_currentToken == COMMA) {
                 Expect(COMMA);
-                IDD();
+                list.Add(IDD());
             }
+
+            return list;
         }
         private void DV() {
             Expect(VAR);
-            LI();
+            var list = LI();
             Expect(COLON);
-            T();
+            var typeAttr = T();
             Expect(SEMI_COLON);
+
+            foreach (var obj in list) {
+                obj.Kind = Kind.VARIABLE_;
+                obj.Type = typeAttr.Type;
+            }
         }
 
         private void LS() {

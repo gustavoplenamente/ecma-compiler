@@ -18,7 +18,7 @@ namespace EcmaCompiler.Parsers {
         }
 
         public Object Define(int name) {
-            var obj = new Object(name, null);
+            var obj = new Object(name, null, Kind.NO_KIND_DEFINED_);
 
             if (_symbolTable[_currentLevel] is null) {
                 _symbolTable[_currentLevel] = obj;
