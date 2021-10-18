@@ -1,16 +1,20 @@
-﻿using EcmaCompiler.Tokens;
+﻿using EcmaCompiler.Parsers;
+using EcmaCompiler.Tokens;
 using static EcmaCompiler.Tokens.Token;
 
 namespace EcmaCompiler {
     public class SyntaxParser {
         private TokenManager _tokenManager;
+        private ScopeManager _scopeManager;
 
         private (Token, int) _current = (UNKNOWN, 0);
         private Token _currentToken => _current.Item1;
+        private int _currentName => _current.Item2;
         private int _currentIndex = -1;
 
-        public SyntaxParser(TokenManager tokenManager) {
+        public SyntaxParser(TokenManager tokenManager, ScopeManager scopeManager) {
             _tokenManager = tokenManager;
+            _scopeManager = scopeManager;
         }
 
         public void Parse() {
@@ -55,9 +59,40 @@ namespace EcmaCompiler {
             Expect(ID);
         }
 
+        private void IDD() {
+            var name = _currentName;
+            ID_();
+
+            var obj = _scopeManager.Search(name);
+
+            if (obj != null)
+                ScopeManager.ScopeError(ScopeErrorType.REDECLARATION_ERROR, name);
+
+            _scopeManager.Define(name);
+        }
+
+        private void NB() {
+            _scopeManager.NewBlock();
+        }
+
+        private void EB() {
+            _scopeManager.EndBlock();
+        }
+
         private void END_() {
             if (_currentToken == END) return;
             SyntaxError(END);
+        }
+
+        private void IDU() {
+            var name = _currentName;
+            ID_();
+
+            var obj = _scopeManager.Find(name);
+            if (obj is null) {
+                ScopeManager.ScopeError(ScopeErrorType.NOT_DECLARED_ERROR, name);
+                _scopeManager.Define(name);
+            }
         }
 
         private void T() {
@@ -66,19 +101,19 @@ namespace EcmaCompiler {
                 case CHAR: Expect(CHAR); break;
                 case BOOLEAN: Expect(BOOLEAN); break;
                 case STRING: Expect(STRING); break;
-                case ID: ID_(); break;
+                case ID: IDU(); break;
                 default: SyntaxError(); break;
             }
         }
 
         private void LV() {
-            ID_();
+            IDU();
             LV_();
         }
 
         private void LV_() {
             switch (_currentToken) {
-                case DOT: Expect(DOT); ID_(); LV_(); break;
+                case DOT: Expect(DOT); IDU(); LV_(); break;
                 case LEFT_SQUARE: Expect(LEFT_SQUARE); E(); Expect(RIGHT_SQUARE); LV_(); break;
             }
         }
@@ -111,7 +146,7 @@ namespace EcmaCompiler {
 
         private void F() {
             switch (_currentToken) {
-                case ID: ID_(); F_(); break;
+                case ID: IDU(); F_(); break;
                 case PLUS_PLUS: Expect(PLUS_PLUS); LV(); break;
                 case MINUS_MINUS: Expect(MINUS_MINUS); LV(); break;
                 case LEFT_PARENTHESIS: Expect(LEFT_PARENTHESIS); E(); Expect(RIGHT_PARENTHESIS); break;
@@ -198,11 +233,11 @@ namespace EcmaCompiler {
         }
 
         private void LI() {
-            ID_();
+            IDD();
 
             while (_currentToken == COMMA) {
                 Expect(COMMA);
-                ID_();
+                IDD();
             }
         }
         private void DV() {
@@ -243,13 +278,13 @@ namespace EcmaCompiler {
         }
 
         private void LP() {
-            ID_();
+            IDD();
             Expect(COLON);
             T();
 
             while (_currentToken == COMMA) {
                 Expect(COMMA);
-                ID_();
+                IDD();
                 Expect(COLON);
                 T();
             }
@@ -257,13 +292,15 @@ namespace EcmaCompiler {
 
         private void DF() {
             Expect(FUNCTION);
-            ID_();
+            IDD();
+            NB();
             Expect(LEFT_PARENTHESIS);
             LP();
             Expect(RIGHT_PARENTHESIS);
             Expect(COLON);
             T();
             B();
+            EB();
         }
 
         private void DC() {
@@ -281,11 +318,11 @@ namespace EcmaCompiler {
 
         private void DT() {
             Expect(TYPE);
-            ID_();
+            IDD();
             Expect(EQUALS);
             switch (_currentToken) {
                 case ARRAY: Expect(ARRAY); Expect(LEFT_SQUARE); NUM(); Expect(RIGHT_SQUARE); Expect(OF); T(); break;
-                case STRUCT: Expect(STRUCT); Expect(LEFT_BRACES); DC(); Expect(RIGHT_BRACES); break;
+                case STRUCT: Expect(STRUCT); NB(); Expect(LEFT_BRACES); DC(); Expect(RIGHT_BRACES); EB(); break;
                 default: T(); break;
             }
         }
