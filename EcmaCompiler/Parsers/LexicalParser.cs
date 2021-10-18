@@ -4,13 +4,13 @@ using System.IO;
 using System.Text;
 
 namespace EcmaCompiler {
-    public class Parser {
+    public class LexicalParser {
         private StreamReader _reader;
         private TokenManager _tokenManager;
         private char _nextChar;
         private bool _isDone = false;
 
-        public Parser(TokenManager tokenManager) {
+        public LexicalParser(TokenManager tokenManager) {
             _tokenManager = tokenManager;
         }
 
@@ -21,6 +21,7 @@ namespace EcmaCompiler {
             while (!_isDone) {
                 ParseNextRule();
             }
+            _tokenManager.SaveToken((Token.END, 0));
         }
 
         private void ParseNextRule() {
@@ -138,11 +139,6 @@ namespace EcmaCompiler {
         }
 
         private (Token, int) ParseSymbol() {
-            if (_nextChar == ':') {
-                ParseNextChar();
-                return (Token.COLON, 0);
-            }
-
             if (_nextChar == ':') {
                 ParseNextChar();
                 return (Token.COLON, 0);

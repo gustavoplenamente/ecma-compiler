@@ -1,0 +1,10 @@
+﻿function sum(a: integer, b: integer) : integer {
+    var x, y, result: integer;
+    
+    x = a;
+    y = b;
+    result = x + y;
+
+    return result;
+}
+

@@ -55,7 +55,8 @@
         STRINGVAL,
         ID,
 
-        // Unknown Token
+        // Special Tokens
+        END,
         UNKNOWN
     }
 }

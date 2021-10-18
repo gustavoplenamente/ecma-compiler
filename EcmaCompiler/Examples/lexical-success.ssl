@@ -1,0 +1,7 @@
+﻿function sum (a: integer, b: integer) {
+	return a + b
+}
+
+var x: integer;
+
+x = 1 + 2

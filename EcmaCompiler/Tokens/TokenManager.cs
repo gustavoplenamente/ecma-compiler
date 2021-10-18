@@ -117,5 +117,7 @@ namespace EcmaCompiler.Tokens {
                 Console.WriteLine("");
             }
         }
+
+        public (Token, int) GetToken(int index) => _tokens[index];
     }
 }
