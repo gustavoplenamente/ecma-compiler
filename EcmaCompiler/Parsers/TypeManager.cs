@@ -17,6 +17,7 @@
         public Object Type;
         public object Val;
         public int Pos;
+        public int Size;
     }
 
     public static class TypeManager {
@@ -39,7 +40,7 @@
                     case Kind.ALIAS_TYPE_:
                         return CheckTypes(t1.BaseType, t2.BaseType);
                     case Kind.ARRAY_TYPE_:
-                        if (t1.Count == t2.Count)
+                        if (t1.ElementsNum == t2.ElementsNum)
                             return CheckTypes(t1.ElementType, t2.ElementType);
                         break;
                     case Kind.STRUCT_TYPE_:

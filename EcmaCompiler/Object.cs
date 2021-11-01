@@ -13,20 +13,30 @@ namespace EcmaCompiler {
         public Object Type { get; set; }
 
         // Function
-        public Object ReturnType { get; }
-        public List<Object> Params { get; }
+        public Object ReturnType { get; set; }
+        public IEnumerable<Object> Params { get; set; }
+        public int ParamsNum { get; set; }
+        public int VarsNum { get; set; }
+
+        // Variable, Parameter, Fields, Function
+        public int IndexNum { get; set; }
 
         // Array
-        public Object ElementType { get; }
-        public int Count { get; }
+        public Object ElementType { get; set; }
+        public int ElementsNum { get; set; }
 
         // Struct
-        public List<Object> Fields { get; }
+        public List<Object> Fields { get; set; }
 
         // Alias
-        public Object BaseType { get; }
+        public Object BaseType { get; set; }
+
+        // Not function
+        public int Size { get; set; }
 
         #endregion
+
+        public Object() { }
 
         public Object(int name, Object next, Kind kind) {
             Name = name;

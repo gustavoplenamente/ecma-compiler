@@ -8,7 +8,7 @@ namespace EcmaCompiler {
             ScopeManager scopeManager = new();
 
             var lexicalParser = new LexicalParser(tokenManager);
-            var syntaxParser = new SyntaxParser(tokenManager, scopeManager);
+            var syntaxParser = new SyntaxParser(tokenManager, scopeManager, "output-code.txt");
 
             //if (args.Length != 1) {
             //    Console.WriteLine("Invalid argument supplied to program: the input should be a single string containing the filename");
